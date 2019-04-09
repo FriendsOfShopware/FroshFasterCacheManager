@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
+
+    <label>TinectFasterCacheManager</label>
+
+    <version>1.0.0</version>
+    <copyright>(c) by tinect</copyright>
+    <license>MIT</license>
+    <link>https://github.com/tinect/TinectFasterCacheManager</link>
+    <author>tinect</author>
+    <compatibility minVersion="5.5.0"/>
+
+    <description><![CDATA[
+
+<p>This plugin uses shell-commands to:
+<ul>
+<li>Significant speed up clearing caching directories</li>
+<li>Significant speed up calculating size and file-count of  caching directories</li>
+</ul>
+</p>
+
+<p>No warranty! :-)</p>
+        ]]>
+    </description>
+
+    <changelog version="1.0.0">
+        <changes lang="de">Erstveröffentlichung</changes>
+        <changes>First release</changes>
+    </changelog>
+
+</plugin>
