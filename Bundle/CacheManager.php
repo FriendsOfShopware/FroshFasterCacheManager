@@ -28,8 +28,6 @@ class CacheManager extends \Shopware\Components\CacheManager
             }
         }
 
-        $this->cleanUpSystemTemp();
-
         parent::clearHttpCache();
     }
 
@@ -113,17 +111,10 @@ class CacheManager extends \Shopware\Components\CacheManager
      */
     private function removeDir($dir)
     {
-        $blankDir = sys_get_temp_dir() . '/' . md5('blank' . time()) . '/';
+        $blankDir = sys_get_temp_dir() . '/' . md5($dir . time()) . '/';
         mkdir($blankDir, 0777, true);
         $rsyncProcess = new Process('rsync -a --delete ' . $blankDir . ' ' . $dir . '/');
         $rsyncProcess->run();
         rmdir($blankDir);
-    }
-
-    private function cleanUpSystemTemp()
-    {
-        $sysDir = sys_get_temp_dir() . '/';
-        $process = new Process('find ' . $sysDir . ' -mtime +7 -execdir rm -- \'{}\' \;');
-        $process->run();
     }
 }
