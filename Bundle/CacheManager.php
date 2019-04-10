@@ -111,10 +111,30 @@ class CacheManager extends \Shopware\Components\CacheManager
      */
     private function removeDir($dir)
     {
-        $blankDir = sys_get_temp_dir() . '/' . md5($dir . time()) . '/';
-        mkdir($blankDir, 0777, true);
-        $rsyncProcess = new Process('rsync -a --delete ' . $blankDir . ' ' . $dir . '/');
+        if ($this->rsyncAvailable()) {
+            $blankDir = sys_get_temp_dir() . '/' . md5($dir . time()) . '/';
+            mkdir($blankDir, 0777, true);
+            $rsyncProcess = new Process('rsync -a --delete ' . $blankDir . ' ' . $dir . '/');
+            $rsyncProcess->run();
+            rmdir($blankDir);
+        } else {
+            $rsyncProcess = new Process('find ' . $dir . '/ -delete');
+            $rsyncProcess->run();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function rsyncAvailable()
+    {
+        $rsyncProcess = new Process('command -v rsync');
         $rsyncProcess->run();
-        rmdir($blankDir);
+
+        if ($rsyncProcess->getOutput() !== '') {
+            return true;
+        }
+
+        return false;
     }
 }
