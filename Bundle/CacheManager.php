@@ -22,10 +22,7 @@ class CacheManager extends \Shopware\Components\CacheManager
     {
         if ($this->container->getParameter('shopware.httpCache.enabled')) {
             $cacheDir = $this->container->getParameter('shopware.httpCache.cache_dir');
-
-            if (strpos($cacheDir, 'production') !== false) {
-                $this->removeDir($cacheDir);
-            }
+            $this->removeDir($cacheDir);
         }
 
         parent::clearHttpCache();
@@ -33,10 +30,15 @@ class CacheManager extends \Shopware\Components\CacheManager
 
     public function getDirectoryInfo($dir)
     {
-        /**
+        /*
          * start original stuff
          */
-        $docRoot = $this->container->getParameter('shopware.app.rootdir') . '/';
+
+        if ($this->container->hasParameter('shopware.app.rootdir')) {
+            $docRoot = $this->container->getParameter('shopware.app.rootdir') . '/';
+        } else {
+            $docRoot = $this->container->getParameter('kernel.root_dir') . '/';
+        }
 
         $info = [];
 
