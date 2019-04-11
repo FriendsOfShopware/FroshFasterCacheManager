@@ -156,18 +156,17 @@ class CacheManager extends \Shopware\Components\CacheManager
         $cacheDir = realpath($cacheDir);
         $rootDir = realpath($this->getRootDir());
 
+        // both should be set
         if (!$cacheDir || !$rootDir) {
             return false;
         }
 
-        if (strpos(realpath($_SERVER['DOCUMENT_ROOT']), $cacheDir) !== false) {
-            return false;
-        }
-
+        // $cacheDir shouldn't be part of $rootDir
         if (strpos($rootDir, $cacheDir) !== false) {
             return false;
         }
 
+        // verify $cacheDir is part of open_basedir
         if (!$this->checkPathInOpenDirs($cacheDir)) {
             return false;
         }
