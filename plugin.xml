@@ -4,12 +4,12 @@
 
     <label>TinectFasterCacheManager</label>
 
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <copyright>(c) by tinect</copyright>
     <license>MIT</license>
     <link>https://github.com/tinect/TinectFasterCacheManager</link>
     <author>tinect</author>
-    <compatibility minVersion="5.5.0"/>
+    <compatibility minVersion="5.3.4"/>
 
     <description><![CDATA[
 
@@ -21,6 +21,11 @@
 </p>
         ]]>
     </description>
+
+    <changelog version="1.0.2">
+        <changes lang="de">Kompatibilität für ältere Versionen</changes>
+        <changes>Compatibility for older version</changes>
+    </changelog>
 
     <changelog version="1.0.1">
         <changes lang="de">Prüfung und Alternative zu rsync eingefügt</changes>
