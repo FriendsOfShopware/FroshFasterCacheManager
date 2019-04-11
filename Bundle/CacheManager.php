@@ -3,7 +3,6 @@
 namespace TinectFasterCacheManager\Bundle;
 
 use Shopware\Components\DependencyInjection\Container;
-use Symfony\Component\Process\Process;
 
 class CacheManager extends \Shopware\Components\CacheManager
 {
@@ -85,10 +84,10 @@ class CacheManager extends \Shopware\Components\CacheManager
     private function getInnodeCount($dir)
     {
         // I want to know all innodes, not just files
-        $shell = new Process('find ' . $dir . '/ | wc -l');
-        $shell->run();
+        $output = null;
+        exec('find ' . $dir . '/ | wc -l', $output);
 
-        return (int) $shell->getOutput();
+        return (int) $output[0];
     }
 
     /**
@@ -98,10 +97,9 @@ class CacheManager extends \Shopware\Components\CacheManager
      */
     private function getSize($dir)
     {
-        $shell = new Process('du -s "' . $dir . '"');
-        $shell->run();
-        $output = $shell->getOutput();
-        if (preg_match('/[0-9]+/', $output, $match)) {
+        $output = null;
+        exec('du -s "' . $dir . '"', $output);
+        if (preg_match('/[0-9]+/', $output[0], $match)) {
             return $match[0] * 1024;
         }
 
@@ -116,12 +114,10 @@ class CacheManager extends \Shopware\Components\CacheManager
         if ($this->rsyncAvailable()) {
             $blankDir = sys_get_temp_dir() . '/' . md5($dir . time()) . '/';
             mkdir($blankDir, 0777, true);
-            $rsyncProcess = new Process('rsync -a --delete ' . $blankDir . ' ' . $dir . '/');
-            $rsyncProcess->run();
+            exec('rsync -a --delete ' . $blankDir . ' ' . $dir . '/');
             rmdir($blankDir);
         } else {
-            $rsyncProcess = new Process('find ' . $dir . '/ -delete');
-            $rsyncProcess->run();
+            exec('find ' . $dir . '/ -delete');
         }
     }
 
@@ -130,10 +126,10 @@ class CacheManager extends \Shopware\Components\CacheManager
      */
     private function rsyncAvailable()
     {
-        $rsyncProcess = new Process('command -v rsync');
-        $rsyncProcess->run();
+        $output = null;
+        exec('command -v rsync', $output);
 
-        if ($rsyncProcess->getOutput() !== '') {
+        if ($output[0] !== '') {
             return true;
         }
 
