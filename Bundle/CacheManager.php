@@ -21,6 +21,11 @@ class CacheManager extends \Shopware\Components\CacheManager
     {
         if ($this->container->getParameter('shopware.httpCache.enabled')) {
             $cacheDir = $this->container->getParameter('shopware.httpCache.cache_dir');
+
+            if (!$this->checkCacheDir($cacheDir)) {
+                return;
+            }
+
             $this->removeDir($cacheDir);
         }
 
@@ -29,16 +34,11 @@ class CacheManager extends \Shopware\Components\CacheManager
 
     public function getDirectoryInfo($dir)
     {
+        $docRoot = $this->getRootDir();
+
         /*
          * start original stuff
          */
-
-        if ($this->container->hasParameter('shopware.app.rootdir')) {
-            $docRoot = $this->container->getParameter('shopware.app.rootdir') . '/';
-        } else {
-            $docRoot = $this->container->getParameter('kernel.root_dir') . '/';
-        }
-
         $info = [];
 
         $info['dir'] = str_replace($docRoot, '', $dir);
@@ -134,5 +134,55 @@ class CacheManager extends \Shopware\Components\CacheManager
         }
 
         return false;
+    }
+
+    /*
+     * special thanks to @aragon999 for inspecting
+     */
+    private function checkCacheDir($cacheDir)
+    {
+        $cacheDir = realpath($cacheDir);
+        $rootDir = realpath($this->getRootDir());
+
+        if (!$cacheDir || !$rootDir) {
+            return false;
+        }
+
+        if (strpos(realpath($_SERVER['DOCUMENT_ROOT']), $cacheDir) !== false) {
+            return false;
+        }
+
+        if (strpos($rootDir, $cacheDir) !== false) {
+            return false;
+        }
+
+        if (!$this->checkPathInOpenDirs($cacheDir)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function checkPathInOpenDirs($dir)
+    {
+        $dir = realpath($dir);
+
+        $openBaseDirs = explode(':', ini_get('open_basedir'));
+        foreach ($openBaseDirs as $openBaseDir) {
+            if (strpos($dir, realpath($openBaseDir)) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getRootDir()
+    {
+        if ($this->container->hasParameter('shopware.app.rootdir')) {
+            return $this->container->getParameter('shopware.app.rootdir') . '/';
+        }
+
+        return $this->container->getParameter('kernel.root_dir') . '/';
     }
 }
