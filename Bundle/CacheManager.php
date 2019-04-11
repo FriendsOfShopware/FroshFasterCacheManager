@@ -64,10 +64,22 @@ class CacheManager extends \Shopware\Components\CacheManager
          * end original stuff
          */
 
-        $info['files'] = $this->getInnodeCount($info['dir']);
+        if (!$info['files'] = $this->getInnodeCount($info['dir'])) {
+            $info = parent::getDirectoryInfo($dir);
+            if (!isset($info['message'])) {
+                $info['message'] = 'Could NOT use FastCacheManager for counting!';
+            }
+
+            return $info;
+        }
 
         if (!$info['size'] = $this->getSize($info['dir'])) {
-            return parent::getDirectoryInfo($dir);
+            $info = parent::getDirectoryInfo($dir);
+            if (!isset($info['message'])) {
+                $info['message'] = 'Could NOT use FastCacheManager for size!';
+            }
+
+            return $info;
         }
 
         $info['size'] = $this->encodeSize($info['size']);
