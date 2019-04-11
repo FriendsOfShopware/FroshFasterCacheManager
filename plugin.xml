@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
     <label>TinectFasterCacheManager</label>
 
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <copyright>(c) by tinect</copyright>
     <license>MIT</license>
     <link>https://github.com/tinect/TinectFasterCacheManager</link>
@@ -19,10 +19,13 @@
 <li>Significant speed up calculating size and file-count of  caching directories</li>
 </ul>
 </p>
-
-<p>No warranty! :-)</p>
         ]]>
     </description>
+
+    <changelog version="1.0.1">
+        <changes lang="de">Prüfung und Alternative zu rsync eingefügt</changes>
+        <changes>Check and related alternative to rsync implemented</changes>
+    </changelog>
 
     <changelog version="1.0.0">
         <changes lang="de">Erstveröffentlichung</changes>
