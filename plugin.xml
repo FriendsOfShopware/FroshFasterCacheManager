@@ -2,13 +2,14 @@
 <plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
-    <label>FroshFasterCacheManager</label>
+    <label>Faster CacheManager</label>
+    <label lang="de">Schneller CacheManager</label>
 
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <copyright>Friends of Shopware</copyright>
     <license>MIT</license>
     <link>https://github.com/FriendsOfShopware/FroshFasterCacheManager</link>
-    <author>tinect</author>
+    <author>Friends of Shopware</author>
     <compatibility minVersion="5.3.4"/>
 
     <description><![CDATA[
@@ -20,6 +21,11 @@ Speed up the CacheManager
 Beschleunigen Sie den CacheManager
         ]]>
     </description>
+
+    <changelog version="1.0.3">
+        <changes lang="de">Willkommen bei FriendsOfShopware. Dieses Plugin ist nun Teil von Frosh.</changes>
+        <changes>Welcome to FriendsOfShopware. This plugin is now part of Frosh.</changes>
+    </changelog>
 
     <changelog version="1.0.2">
         <changes lang="de">Kompatibilität für ältere Versionen</changes>
