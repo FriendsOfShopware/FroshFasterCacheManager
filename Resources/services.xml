@@ -4,8 +4,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service class="TinectFasterCacheManager\Bundle\CacheManager"
-                 id="tinect_faster_cache_manager_bundle.cache_manager"
+        <service class="FroshFasterCacheManager\Bundle\CacheManager"
+                 id="frosh_faster_cache_manager_bundle.cache_manager"
                  decorates="shopware.cache_manager"
                  public="true">
             <argument type="service" id="service_container" />

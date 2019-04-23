@@ -1,0 +1,19 @@
+{
+  "name": "frosh/faster-cache-manager",
+  "keywords": [
+    "shopware",
+    "cachemanager",
+    "cache",
+    "speed",
+    "performance"
+  ],
+  "description": "",
+  "license": "MIT",
+  "type": "shopware-plugin",
+  "extra": {
+    "installer-name": "FroshFasterCacheManager"
+  },
+  "require": {
+    "composer/installers": "~1.0"
+  }
+}

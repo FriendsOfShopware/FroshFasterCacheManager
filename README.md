@@ -1,4 +1,4 @@
-# TinectFasterCacheManager
+# FroshFasterCacheManager
 
 ## Description
 
@@ -14,12 +14,12 @@ This plugin speeds up Backend CacheManager.
 
 ## Zip-Installation
 
-* Download the [latest plugin version](https://github.com/tinect/TinectFasterCacheManager/releases/latest/)
+* Download the [latest plugin version](https://github.com/FriendsOfShopware/FroshFasterCacheManager/releases/latest/)
 * Upload and install plugin using Plugin Manager
 
 ## Contributing
 
-Feel free to fork and send [pull requests](https://github.com/tinect/TinectFasterCacheManager)!
+Feel free to fork and send [pull requests](https://github.com/FriendsOfShopware/FroshFasterCacheManager)!
 
 
 ## Licence

@@ -1,6 +1,6 @@
 <?php
 
-namespace TinectFasterCacheManager\Bundle;
+namespace FroshFasterCacheManager\Bundle;
 
 use Shopware\Components\DependencyInjection\Container;
 

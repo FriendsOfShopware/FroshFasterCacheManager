@@ -2,25 +2,29 @@
 <plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="../../../engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
-    <label>TinectFasterCacheManager</label>
+    <label>FroshFasterCacheManager</label>
 
     <version>1.0.2</version>
-    <copyright>(c) by tinect</copyright>
+    <copyright>Friends of Shopware</copyright>
     <license>MIT</license>
-    <link>https://github.com/tinect/TinectFasterCacheManager</link>
+    <link>https://github.com/FriendsOfShopware/FroshFasterCacheManager</link>
     <author>tinect</author>
     <compatibility minVersion="5.3.4"/>
 
     <description><![CDATA[
-
-<p>This plugin uses shell-commands to:
-<ul>
-<li>Significant speed up clearing caching directories</li>
-<li>Significant speed up calculating size and file-count of  caching directories</li>
-</ul>
-</p>
+Speed up the CacheManager
         ]]>
     </description>
+
+    <description lang="de"><![CDATA[
+Beschleunigen Sie den CacheManager
+        ]]>
+    </description>
+
+    <changelog version="1.0.2">
+        <changes lang="de">Kompatibilität für ältere Versionen</changes>
+        <changes>Compatibility for older version</changes>
+    </changelog>
 
     <changelog version="1.0.2">
         <changes lang="de">Kompatibilität für ältere Versionen</changes>
