@@ -13,12 +13,12 @@
     <compatibility minVersion="5.3.4"/>
 
     <description><![CDATA[
-Speed up the CacheManager
+Speed up the CacheManager. This plugin makes it possible to speed up the CacheManager by using shell commands. Calculates size and count of every item within folder, not just files.
         ]]>
     </description>
 
     <description lang="de"><![CDATA[
-Beschleunigen Sie den CacheManager
+Beschleunigen Sie den CacheManager. Dieses Plugin ermöglicht es, den CacheManager durch Verwendung von Shell-Befehlen zu beschleunigen. Deutlich schnelleres Löschen von Cache-Folder.
         ]]>
     </description>
 
