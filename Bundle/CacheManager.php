@@ -125,7 +125,11 @@ class CacheManager extends \Shopware\Components\CacheManager
     {
         if ($this->rsyncAvailable()) {
             $blankDir = sys_get_temp_dir() . '/' . md5($dir . time()) . '/';
-            mkdir($blankDir, 0777, true);
+
+            if (!mkdir($blankDir, 0777, true) && !is_dir($blankDir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $blankDir));
+            }
+
             exec('rsync -a --delete ' . $blankDir . ' ' . $dir . '/');
             rmdir($blankDir);
         } else {
