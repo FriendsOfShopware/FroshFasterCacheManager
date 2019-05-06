@@ -19,13 +19,10 @@ class CacheManager extends \Shopware\Components\CacheManager
 
     public function clearHttpCache()
     {
-        if ($this->container->getParameter('shopware.httpCache.enabled')) {
-            $cacheDir = $this->container->getParameter('shopware.httpCache.cache_dir');
+        $cacheEnabled = $this->container->getParameter('shopware.httpCache.enabled');
+        $cacheDir = $this->container->getParameter('shopware.httpCache.cache_dir');
 
-            if (!$this->checkCacheDir($cacheDir)) {
-                return;
-            }
-
+        if ($cacheEnabled && $this->checkCacheDir($cacheDir)) {
             $this->removeDir($cacheDir);
         }
 

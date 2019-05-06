@@ -5,7 +5,7 @@
     <label>Faster CacheManager</label>
     <label lang="de">Schneller CacheManager</label>
 
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <copyright>Friends of Shopware</copyright>
     <license>MIT</license>
     <link>https://github.com/FriendsOfShopware/FroshFasterCacheManager</link>
@@ -21,6 +21,11 @@ Speed up the CacheManager. This plugin makes it possible to speed up the CacheMa
 Beschleunigen Sie den CacheManager. Dieses Plugin ermöglicht es, den CacheManager durch Verwendung von Shell-Befehlen zu beschleunigen. Deutlich schnelleres Löschen von Cache-Folder.
         ]]>
     </description>
+
+    <changelog version="1.0.4">
+        <changes lang="de">Dieses Update stellt nun sicher, dass das Event Shopware_Plugins_HttpCache_ClearCache immer gerufen wird</changes>
+        <changes>This update ensures the event Shopware_Plugins_HttpCache_ClearCache to be fired</changes>
+    </changelog>
 
     <changelog version="1.0.3">
         <changes lang="de">Willkommen bei FriendsOfShopware. Dieses Plugin ist nun Teil von Frosh.</changes>
