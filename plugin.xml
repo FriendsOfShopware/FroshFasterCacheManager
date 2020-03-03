@@ -10,7 +10,7 @@
     <license>MIT</license>
     <link>https://github.com/FriendsOfShopware/FroshFasterCacheManager</link>
     <author>Friends of Shopware</author>
-    <compatibility minVersion="5.3.4"/>
+    <compatibility minVersion="5.6.5"/>
 
     <description><![CDATA[
 Speed up the CacheManager. This plugin makes it possible to speed up the CacheManager by using shell commands. Calculates size and count of every item within folder, not just files.
