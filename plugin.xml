@@ -5,12 +5,12 @@
     <label>Faster CacheManager</label>
     <label lang="de">Schneller CacheManager</label>
 
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <copyright>Friends of Shopware</copyright>
     <license>MIT</license>
     <link>https://github.com/FriendsOfShopware/FroshFasterCacheManager</link>
     <author>Friends of Shopware</author>
-    <compatibility minVersion="5.3.4"/>
+    <compatibility minVersion="5.6.5"/>
 
     <description><![CDATA[
 Speed up the CacheManager. This plugin makes it possible to speed up the CacheManager by using shell commands. Calculates size and count of every item within folder, not just files.
@@ -21,6 +21,11 @@ Speed up the CacheManager. This plugin makes it possible to speed up the CacheMa
 Beschleunigen Sie den CacheManager. Dieses Plugin ermöglicht es, den CacheManager durch Verwendung von Shell-Befehlen zu beschleunigen. Deutlich schnelleres Löschen von Cache-Folder.
         ]]>
     </description>
+
+    <changelog version="1.0.5">
+        <changes lang="de">Kompatibilität zur Shopware Version 5.6.5/changes>
+        <changes>Add compatibility to shopware version 5.6.5</changes>
+    </changelog>
 
     <changelog version="1.0.4">
         <changes lang="de">Dieses Update stellt nun sicher, dass das Event Shopware_Plugins_HttpCache_ClearCache immer gerufen wird</changes>
