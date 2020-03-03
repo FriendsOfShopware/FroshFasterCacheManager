@@ -1,88 +1,202 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace FroshFasterCacheManager\Bundle;
 
-use Shopware\Components\DependencyInjection\Container;
+use Doctrine\DBAL\Connection;
+use Enlight_Controller_Request_Request;
+use RecursiveIteratorIterator;
+use RuntimeException;
+use Shopware\Components\ContainerAwareEventManager;
+use Shopware\Components\Model\Configuration;
+use Shopware\Components\Theme\PathResolver;
+use Shopware_Components_Config;
+use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
+use Symfony\Component\Finder\SplFileInfo;
+use Zend_Cache;
+use Zend_Cache_Backend_File;
+use Zend_Cache_Core;
 
 class CacheManager extends \Shopware\Components\CacheManager
 {
     /**
-     * @var Container
+     * @var string
      */
-    private $container;
+    private $docRoot;
+    /**
+     * @var array
+     */
+    private $httpCache;
+    /**
+     * @var Zend_Cache_Core
+     */
+    private $cache;
+    /**
+     * @var array
+     */
+    private $cacheConfig;
+    /**
+     * @var array
+     */
+    private $templateConfig;
+    /**
+     * @var string
+     */
+    private $hookProxyDir;
+    /**
+     * @var string
+     */
+    private $modelProxyDir;
+    /**
+     * @var PathResolver
+     */
+    private $themePathResolver;
 
-    public function __construct($container)
+    public function __construct(
+        Zend_Cache_Core $cache,
+        Configuration $emConfig,
+        Connection $db,
+        Shopware_Components_Config $config,
+        ContainerAwareEventManager $events,
+        PathResolver $themePathResolver,
+        array $httpCache,
+        array $cacheConfig,
+        array $templateConfig,
+        string $docRoot,
+        string $hookProxyDir,
+        string $modelProxyDir
+    ) {
+        parent::__construct(
+            $cache,
+            $emConfig,
+            $db,
+            $config,
+            $events,
+            $themePathResolver,
+            $httpCache,
+            $cacheConfig,
+            $templateConfig,
+            $docRoot,
+            $hookProxyDir,
+            $modelProxyDir
+        );
+        $this->docRoot = $docRoot;
+        $this->httpCache = $httpCache;
+        $this->cache = $cache;
+        $this->cacheConfig = $cacheConfig;
+        $this->templateConfig = $templateConfig;
+        $this->hookProxyDir = $hookProxyDir;
+        $this->modelProxyDir = $modelProxyDir;
+        $this->themePathResolver = $themePathResolver;
+    }
+
+    /**
+     * Returns cache information
+     *
+     * @param Enlight_Controller_Request_Request|null $request
+     *
+     * @return array
+     */
+    public function getHttpCacheInfo($request = null)
     {
-        parent::__construct($container);
-        $this->container = $container;
+        $info = $this->httpCache['enabled'] ? $this->getDirectoryInfoFast($this->httpCache['cache_dir']) : [];
+
+        $info['name'] = 'Http-Reverse-Proxy';
+        $info['backend'] = 'Unknown';
+
+        if ($request && $request->getHeader('Surrogate-Capability')) {
+            $info['backend'] = $request->getHeader('Surrogate-Capability');
+        }
+
+        return $info;
+    }
+
+    /**
+     * Returns cache information
+     *
+     * @return array
+     */
+    public function getConfigCacheInfo()
+    {
+        $backendCache = $this->cache->getBackend();
+
+        if (!$backendCache instanceof Zend_Cache_Backend_File) {
+            return parent::getConfigCacheInfo();
+        }
+
+        $dir = null;
+
+        if (!empty($this->cacheConfig['backendOptions']['cache_dir'])) {
+            $dir = $this->cacheConfig['backendOptions']['cache_dir'];
+        } elseif (!empty($this->cacheConfig['backendOptions']['slow_backend_options']['cache_dir'])) {
+            $dir = $this->cacheConfig['backendOptions']['slow_backend_options']['cache_dir'];
+        }
+        $info = $this->getDirectoryInfoFast($dir);
+        $info['name'] = 'Shopware configuration';
+        $info['backend'] = 'File';
+
+        return $info;
+    }
+
+    /**
+     * Returns template cache information
+     *
+     * @return array
+     */
+    public function getTemplateCacheInfo()
+    {
+        $info = $this->getDirectoryInfoFast($this->templateConfig['compileDir']);
+        $info['name'] = 'Shopware templates';
+
+        return $info;
+    }
+
+    /**
+     * Returns template cache information
+     *
+     * @return array
+     */
+    public function getThemeCacheInfo()
+    {
+        $dir = $this->themePathResolver->getCacheDirectory();
+        $info = $this->getDirectoryInfoFast($dir);
+        $info['name'] = 'Shopware theme';
+
+        return $info;
+    }
+
+    /**
+     * Returns cache information
+     *
+     * @return array
+     */
+    public function getDoctrineProxyCacheInfo()
+    {
+        $info = $this->getDirectoryInfoFast($this->modelProxyDir);
+        $info['name'] = 'Doctrine Proxies';
+
+        return $info;
+    }
+
+    /**
+     * Returns cache information
+     *
+     * @return array
+     */
+    public function getShopwareProxyCacheInfo()
+    {
+        $info = $this->getDirectoryInfoFast($this->hookProxyDir);
+        $info['name'] = 'Shopware Proxies';
+
+        return $info;
     }
 
     public function clearHttpCache()
     {
-        $cacheEnabled = $this->container->getParameter('shopware.httpCache.enabled');
-        $cacheDir = $this->container->getParameter('shopware.httpCache.cache_dir');
-
-        if ($cacheEnabled && $this->checkCacheDir($cacheDir)) {
-            $this->removeDir($cacheDir);
+        if ($this->httpCache['enabled'] && $this->checkCacheDir($this->httpCache['cache_dir'])) {
+            $this->removeDir($this->httpCache['cache_dir']);
         }
 
         parent::clearHttpCache();
-    }
-
-    public function getDirectoryInfo($dir)
-    {
-        $docRoot = $this->getRootDir();
-
-        /*
-         * start original stuff
-         */
-        $info = [];
-
-        $info['dir'] = str_replace($docRoot, '', $dir);
-        $info['dir'] = str_replace(DIRECTORY_SEPARATOR, '/', $info['dir']);
-        $info['dir'] = rtrim($info['dir'], '/') . '/';
-
-        if (!file_exists($dir) || !is_dir($dir)) {
-            $info['message'] = 'Cache dir not exists';
-
-            return $info;
-        }
-
-        if (!is_readable($dir)) {
-            $info['message'] = 'Cache dir is not readable';
-
-            return $info;
-        }
-
-        if (!is_writable($dir)) {
-            $info['message'] = 'Cache dir is not writable';
-        }
-        /*
-         * end original stuff
-         */
-
-        if (!$info['files'] = $this->getInnodeCount($info['dir'])) {
-            $info = parent::getDirectoryInfo($dir);
-            if (!isset($info['message'])) {
-                $info['message'] = 'Could NOT use FastCacheManager for counting!';
-            }
-
-            return $info;
-        }
-
-        if (!$info['size'] = $this->getSize($info['dir'])) {
-            $info = parent::getDirectoryInfo($dir);
-            if (!isset($info['message'])) {
-                $info['message'] = 'Could NOT use FastCacheManager for size!';
-            }
-
-            return $info;
-        }
-
-        $info['size'] = $this->encodeSize($info['size']);
-        $info['freeSpace'] = $this->encodeSize(disk_free_space($dir));
-
-        return $info;
     }
 
     /**
@@ -124,7 +238,7 @@ class CacheManager extends \Shopware\Components\CacheManager
             $blankDir = sys_get_temp_dir() . '/' . md5($dir . time()) . '/';
 
             if (!mkdir($blankDir, 0777, true) && !is_dir($blankDir)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $blankDir));
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $blankDir));
             }
 
             exec('rsync -a --delete ' . $blankDir . ' ' . $dir . '/');
@@ -155,7 +269,7 @@ class CacheManager extends \Shopware\Components\CacheManager
     private function checkCacheDir($cacheDir)
     {
         $cacheDir = realpath($cacheDir);
-        $rootDir = realpath($this->getRootDir());
+        $rootDir = realpath($this->docRoot);
 
         // both should be set
         if (!$cacheDir || !$rootDir) {
@@ -189,12 +303,136 @@ class CacheManager extends \Shopware\Components\CacheManager
         return false;
     }
 
-    private function getRootDir()
+    /**
+     * Format size method
+     *
+     * @param float $bytes
+     *
+     * @return string
+     */
+    private function convertSize($bytes)
     {
-        if ($this->container->hasParameter('shopware.app.rootdir')) {
-            return $this->container->getParameter('shopware.app.rootdir') . '/';
+        $types = ['B', 'KB', 'MB', 'GB', 'TB'];
+        for ($i = 0; $bytes >= 1024 && $i < (count($types) - 1); ++$i) {
+            $bytes /= 1024;
         }
 
-        return $this->container->getParameter('kernel.root_dir') . '/';
+        return round($bytes, 2) . ' ' . $types[$i];
+    }
+
+    private function getShortDirectoryInfo($dir)
+    {
+        $info = [];
+        $info['dir'] = str_replace($this->docRoot . '/', '', $dir);
+        $info['dir'] = str_replace(DIRECTORY_SEPARATOR, '/', $info['dir']);
+        $info['dir'] = rtrim($info['dir'], '/') . '/';
+
+        if (is_string($this->checkDir($dir))) {
+            $info['message'] = $this->checkDir($dir);
+
+            return $info;
+        }
+
+        $info['size'] = (float) 0;
+        $info['files'] = 0;
+
+        return $info;
+    }
+
+    /**
+     * Returns cache information by try using fast ways
+     *
+     * @param string $dir
+     *
+     * @return array
+     */
+    private function getDirectoryInfoFast($dir)
+    {
+        $info = $this->getShortDirectoryInfo($dir);
+
+        if (isset($info['message'])) {
+            return $info;
+        }
+
+        if (!$info['files'] = $this->getInnodeCount($info['dir'])) {
+            $info = $this->getDirectoryInfoSlow($dir);
+            if (!isset($info['message'])) {
+                $info['message'] = 'Could NOT use FastCacheManager for counting!';
+            }
+
+            return $info;
+        }
+
+        if (!$info['size'] = $this->getSize($info['dir'])) {
+            $info = $this->getDirectoryInfoSlow($dir);
+            if (!isset($info['message'])) {
+                $info['message'] = 'Could NOT use FastCacheManager for size!';
+            }
+
+            return $info;
+        }
+
+        $info['size'] = $this->convertSize($info['size']);
+        $info['freeSpace'] = $this->convertSize(disk_free_space($dir));
+
+        return $info;
+    }
+
+    /**
+     * Returns cache information by using slow ways
+     *
+     * @param string $dir
+     *
+     * @return array
+     */
+    private function getDirectoryInfoSlow($dir)
+    {
+        $info = $this->getShortDirectoryInfo($dir);
+
+        if (isset($info['message'])) {
+            return $info;
+        }
+
+        $dirIterator = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+        $iterator = new RecursiveIteratorIterator(
+            $dirIterator,
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        /** @var SplFileInfo $entry */
+        foreach ($iterator as $entry) {
+            if ($entry->getFilename() === '.gitkeep') {
+                continue;
+            }
+
+            if (!$entry->isFile()) {
+                continue;
+            }
+
+            $info['size'] += $entry->getSize();
+            ++$info['files'];
+        }
+        $info['size'] = $this->convertSize($info['size']);
+        $info['freeSpace'] = disk_free_space($dir);
+        $info['freeSpace'] = $this->convertSize($info['freeSpace']);
+
+        return $info;
+    }
+
+    private function checkDir($dir)
+    {
+        if (!file_exists($dir) || !is_dir($dir)) {
+            return 'Cache dir not exists';
+        }
+
+        if (!is_readable($dir)) {
+            return 'Cache dir is not readable';
+        }
+
+        if (!is_writable($dir)) {
+            return 'Cache dir is not writable';
+        }
+
+        return true;
     }
 }
