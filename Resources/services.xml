@@ -15,14 +15,12 @@
             <argument type="service" id="events"/>
             <argument type="service" id="theme_path_resolver" />
 
-            <argument>%shopware.httpCache%</argument>
+            <argument>%shopware.httpcache%</argument>
             <argument>%shopware.cache%</argument>
             <argument>%shopware.template%</argument>
-            <argument>%shopware.app.rootdir%</argument>
+            <argument>%shopware.app.rootDir%</argument>
             <argument>%shopware.hook.proxyDir%</argument>
             <argument>%shopware.model.proxyDir%</argument>
-            <argument>%shopware.httpCache.enabled%</argument>
-            <argument>%shopware.httpCache.enabled%</argument>
         </service>
     </services>
 
